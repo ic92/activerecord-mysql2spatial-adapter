@@ -60,7 +60,7 @@ module ActiveRecord
           super(name_, default_,sql_type_, null_)
           @geometric_type = ::RGeo::ActiveRecord.geometric_type_from_name(sql_type_)
           if type == :spatial
-            @limit = {:type => @geometric_type.type_name.underscore}
+            @limit = {type: @geometric_type.type_name.underscore}
           end
           FACTORY_SETTINGS_CACHE[factory_settings_.object_id] = factory_settings_
         end
@@ -109,7 +109,7 @@ module ActiveRecord
         def self.convert_to_geometry(input_, factory_settings_, table_name_, column_)
           case input_
           when ::RGeo::Feature::Geometry
-            factory_ = factory_settings_.get_column_factory(table_name_, column_, :srid => input_.srid)
+            factory_ = factory_settings_.get_column_factory(table_name_, column_, srid: input_.srid)
             ::RGeo::Feature.cast(input_, factory_) rescue nil
           when ::String
             marker_ = input_[4,1]
@@ -122,7 +122,7 @@ module ActiveRecord
               if input[9,1] == '1'
                 srid_ = [srid_].pack('V').unpack('N').first
               end
-              factory_ = factory_settings_.get_column_factory(table_name_, column_, :srid => srid_)
+              factory_ = factory_settings_.get_column_factory(table_name_, column_, srid: srid_)
               ::RGeo::WKRep::WKBParser.new(factory_).parse(input_[8..-1]) rescue nil
             else
               factory_ = factory_settings_.get_column_factory(table_name_, column_)

@@ -46,7 +46,7 @@ module ActiveRecord
       class MainAdapter < ConnectionAdapters::Mysql2Adapter
 
 
-        NATIVE_DATABASE_TYPES = Mysql2Adapter::NATIVE_DATABASE_TYPES.merge(:spatial => {:name => "geometry"})
+        NATIVE_DATABASE_TYPES = Mysql2Adapter::NATIVE_DATABASE_TYPES.merge(spatial: {name: "geometry"})
 
 
         def initialize(*args_)
@@ -80,7 +80,7 @@ module ActiveRecord
 
         def quote(value_, column_=nil)
           if ::RGeo::Feature::Geometry.check_type(value_)
-            "GeomFromWKB(0x#{::RGeo::WKRep::WKBGenerator.new(:hex_format => true).generate(value_)},#{value_.srid})"
+            "GeomFromWKB(0x#{::RGeo::WKRep::WKBGenerator.new(hex_format: true).generate(value_)},#{value_.srid})"
           else
             super
           end
@@ -99,7 +99,7 @@ module ActiveRecord
 
         def add_index(table_name_, column_name_, options_={})
           if options_[:spatial]
-            index_name_ = index_name(table_name_, :column => Array(column_name_))
+            index_name_ = index_name(table_name_, column: Array(column_name_))
             if ::Hash === options_
               index_name_ = options_[:name] || index_name_
             end
@@ -113,7 +113,7 @@ module ActiveRecord
         def columns(table_name_, name_=nil)
           result_ = execute("SHOW FIELDS FROM #{quote_table_name(table_name_)}", :skip_logging)
           columns_ = []
-          result_.each(:symbolize_keys => true, :as => :hash) do |field_|
+          result_.each(symbolize_keys: true, as: :hash) do |field_|
             columns_ << SpatialColumn.new(@rgeo_factory_settings, table_name_.to_s,
               field_[:Field], field_[:Default], field_[:Type], field_[:Null] == "YES")
           end
@@ -125,7 +125,7 @@ module ActiveRecord
           indexes_ = []
           current_index_ = nil
           result_ = execute("SHOW KEYS FROM #{quote_table_name(table_name_)}", name_)
-          result_.each(:symbolize_keys => true, :as => :hash) do |row_|
+          result_.each(symbolize_keys: true, as: :hash) do |row_|
             if current_index_ != row_[:Key_name]
               next if row_[:Key_name] == 'PRIMARY' # skip the primary key
               current_index_ = row_[:Key_name]
